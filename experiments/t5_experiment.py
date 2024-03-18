@@ -19,6 +19,16 @@ SEED = 777
 train = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='train'))
 test = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='test'))
 
+train['News Content'] = train['News Content'].astype(str)
+train['Headline'] = train['Headline'].astype(str)
+train = train[df['News Content'].notna()]
+train = train[df['Headline'].notna()]
+
+test['News Content'] = test['News Content'].astype(str)
+test['Headline'] = test['Headline'].astype(str)
+test = test[df['News Content'].notna()]
+test = test[df['Headline'].notna()]
+
 train["prefix"] = ""
 test["prefix"] = ""
 
