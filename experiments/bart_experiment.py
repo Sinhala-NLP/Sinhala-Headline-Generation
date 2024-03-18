@@ -7,17 +7,30 @@ import pandas as pd
 from config.model_args import Seq2SeqArgs
 
 from seq2seq.seq2seq_model import Seq2SeqModel
-from transformer_model.evaluation import bleu, ter
+from experiments.evaluation import bleu
 
 model_name = "facebook/mbart-large-cc25"
 model_type = "mbart"
 
 SEED = 777
-full = pd.read_json("NSINa.json")
-full["prefix"] = ""
-full = full.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
+train = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='train'))
+test = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='test'))
 
-full_train, test = train_test_split(full, test_size=0.2, random_state=SEED)
+train['News Content'] = train['News Content'].astype(str)
+train['Headline'] = train['Headline'].astype(str)
+train = train[train['News Content'].notna()]
+train = train[train['Headline'].notna()]
+
+test['News Content'] = test['News Content'].astype(str)
+test['Headline'] = test['Headline'].astype(str)
+test = test[test['News Content'].notna()]
+test = test[test['Headline'].notna()]
+
+train["prefix"] = ""
+test["prefix"] = ""
+
+train = train.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
+test = test.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
 
 model_args = Seq2SeqArgs()
 model_args.num_train_epochs = 10
@@ -76,5 +89,5 @@ test.to_csv(os.path.join("outputs", "mbart", "predictions.tsv"), sep='\t', encod
 
 
 print("Bleu Score ", bleu(truth_list, preds))
-print("Ter Score ", ter(truth_list, preds))
+
 
