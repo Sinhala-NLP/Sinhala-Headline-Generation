@@ -29,7 +29,7 @@ test = test.rename(columns={'News Content': 'input_text', 'Headline': 'target_te
 model_args = T5Args()
 model_args.num_train_epochs = 10
 model_args.no_save = False
-model_args.flax_model = True
+model_args.flax_model = False
 model_args.fp16 = False
 model_args.learning_rate = 1e-4
 model_args.train_batch_size = 8
