@@ -10,8 +10,8 @@ from config.model_args import T5Args
 from t5.t5_model import T5Model
 from transformer_model.evaluation import bleu, ter
 
-model_name = "sinhala-nlp/sin-t5-oscar"
-model_type = "t5"
+model_name = "google/mt5-large"
+model_type = "mt5"
 
 
 SEED = 777
