@@ -15,11 +15,15 @@ model_type = "mt5"
 
 
 SEED = 777
-full = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA', split='train'))
-full["prefix"] = ""
-full = full.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
+train = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='train'))
+test = Dataset.to_pandas(load_dataset('sinhala-nlp/NSINA-Headlines', split='test'))
 
-full_train, test = train_test_split(full, test_size=0.2, random_state=SEED)
+train["prefix"] = ""
+test["prefix"] = ""
+
+train = train.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
+test = test.rename(columns={'News Content': 'input_text', 'Headline': 'target_text'})
+
 
 model_args = T5Args()
 model_args.num_train_epochs = 10
@@ -43,17 +47,19 @@ model_args.manual_seed = SEED
 model_args.early_stopping_patience = 25
 model_args.save_steps = 20000
 
-model_args.output_dir = os.path.join("outputs", "sint5_oscar_2")
-model_args.best_model_dir = os.path.join("outputs", "sint5_oscar_2", "best_model")
-model_args.cache_dir = os.path.join("cache_dir", "sint5_oscar_2")
+processed_model_name = model_name.split("/")[1]
+
+model_args.output_dir = os.path.join("outputs", processed_model_name)
+model_args.best_model_dir = os.path.join("outputs", processed_model_name, "best_model")
+model_args.cache_dir = os.path.join("cache_dir", processed_model_name)
 
 model_args.wandb_project = "NSINa Caption Generation"
 model_args.wandb_kwargs = {"name": model_name}
 
 model = T5Model(model_type, model_name, args=model_args, use_cuda=torch.cuda.is_available())
 
-train, eval = train_test_split(full_train, test_size=0.2, random_state=SEED)
-model.train_model(train, eval_data=eval)
+temp_train, eval = train_test_split(train, test_size=0.2, random_state=SEED)
+model.train_model(temp_train, eval_data=eval)
 
 input_list = test['input_text'].tolist()
 truth_list = test['target_text'].tolist()
@@ -62,7 +68,7 @@ model = T5Model(model_type, model_args.best_model_dir, args=model_args, use_cuda
 preds = model.predict(input_list)
 
 test["predictions"] = preds
-test.to_csv(os.path.join("outputs", "sint5_oscar_2", "predictions.tsv"), sep='\t', encoding='utf-8', index=False)
+test.to_csv(os.path.join("outputs", processed_model_name, "predictions.tsv"), sep='\t', encoding='utf-8', index=False)
 
 del model
 
