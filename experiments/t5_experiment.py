@@ -2,13 +2,14 @@ import os
 
 import pandas as pd
 import torch
+from experiments.evaluation import bleu
 from sklearn.model_selection import train_test_split
 from datasets import Dataset
 from datasets import load_dataset
 from config.model_args import T5Args
 
 from t5.t5_model import T5Model
-from transformer_model.evaluation import bleu, ter
+
 
 model_name = "google/mt5-large"
 model_type = "mt5"
