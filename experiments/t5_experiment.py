@@ -11,7 +11,7 @@ from config.model_args import T5Args
 from t5.t5_model import T5Model
 
 
-model_name = "google/mt5-large"
+model_name = "google/mt5-base"
 model_type = "mt5"
 
 
